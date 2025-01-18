@@ -1,26 +1,33 @@
-﻿namespace RetryMachine.Api
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
+
+namespace RetryMachine.Api.RetryMachine
 {
-    public interface IIRetryStorage
-    {
-        public Task Save(RetryTask retryTask);
-        public Task Update(RetryTask retryTask);
-        public Task<List<RetryTask>> Get();
-    }
-
-    public interface IRetryMachine
-    {
-        Task CreateTasks(Dictionary<string, string> tasks);
-    }
-
     public class RetryMachine : IRetryMachine
     {
-        private IIRetryStorage _storage;
+        private IRetryStorage _storage;
         private List<IRetryable> _possibleActions;
 
-        public RetryMachine(IIRetryStorage storage, IEnumerable<IRetryable> possibleActions)
+        public RetryMachine(IRetryStorage storage, IEnumerable<IRetryable> possibleActions)
         {
             _storage = storage;
             _possibleActions = possibleActions.ToList();
+        }
+
+        public Task CreateTasks<T>(string actionName, T value)
+        {
+            return CreateTasks(new Dictionary<string, string> { { actionName, value.ToString() } });
+        }
+
+        public Task CreateTasks(string actionName, string value)
+        {
+            return CreateTasks(new Dictionary<string, string> { { actionName, value } });
+        }
+
+        public Task CreateTasks(Dictionary<string, object> tasks)
+        {
+            return CreateTasks(tasks.ToDictionary(k => k.Key, v => v.Value.ToString()));
         }
 
         public async Task CreateTasks(Dictionary<string, string> tasks)
@@ -46,7 +53,7 @@
 
             foreach (var task in taskList)
             {
-
+                await DoTaskInner(task);
             }
         }
 

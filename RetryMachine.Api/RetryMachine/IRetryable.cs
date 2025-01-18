@@ -1,4 +1,4 @@
-﻿namespace RetryMachine.Api
+﻿namespace RetryMachine.Api.RetryMachine
 {
     public interface IRetryable
     {

@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using RetryMachine.Api.Actions;
+using RetryMachine.Api.RetryMachine;
 
 namespace RetryMachine.Api.Controllers
 {
@@ -6,28 +8,42 @@ namespace RetryMachine.Api.Controllers
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
+        private IRetryMachine _retryMachine;
 
         private readonly ILogger<WeatherForecastController> _logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(ILogger<WeatherForecastController> logger, IRetryMachine retryMachine)
         {
             _logger = logger;
+            _retryMachine = retryMachine;
         }
 
         [HttpGet(Name = "GetWeatherForecast")]
-        public IEnumerable<WeatherForecast> Get()
+        public async Task Get()
         {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+            //await _retryMachine.CreateTasks(AutoLogAction.ActionName, new AutoLogSettings
+            //{
+            //    AccountHolderId = 11,
+            //    Template = ""
+            //});
+
+
+            await _retryMachine.CreateTasks(new Dictionary<string, object>
             {
-                Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
+                { 
+                    AutoLogAction.ActionName, new AutoLogSettings
+                    {
+                        AccountHolderId = 11,
+                        Template = ""
+                    }
+                },
+                {
+                    UserActionLogAction.ActionName, new UserActionLogSettings
+                    {
+                        ActionId = 11
+                    }
+                }
+            });
         }
     }
 }
