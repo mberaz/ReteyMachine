@@ -33,6 +33,7 @@ namespace RetryMachine.Api.RetryMachine
         public async Task CreateTasks(Dictionary<string, string> tasks)
         {
             var actions = new JObject();
+
             foreach (var task in tasks)
             {
                 actions[task.Key] = task.Value;
@@ -59,18 +60,18 @@ namespace RetryMachine.Api.RetryMachine
 
         private async Task DoTaskInner(RetryTask retryTask)
         {
-            var actionsActions = ToDictionary(retryTask.NextActions);
+            var nextActions = ToDictionary(retryTask.NextActions);
             var completedDictionary = ToDictionary(retryTask.CompletedActions);
             var failedActions = ToDictionary(retryTask.FailedActions);
 
-            foreach (var action in actionsActions)
+            foreach (var action in nextActions)
             {
                 var taskToDo = _possibleActions.FirstOrDefault(f => f.Name() == action.Key);
                 var result = await taskToDo.Perform(action.Value);
 
                 if (result.isOk)
                 {
-                    actionsActions.Remove(action.Key);
+                    nextActions.Remove(action.Key);
                     completedDictionary[action.Key] = action.Value;
                     failedActions.Remove(action.Key);//remove this from the failed list if it passed now
                 }
@@ -82,12 +83,12 @@ namespace RetryMachine.Api.RetryMachine
                     retryTask.ActionOn = DateTime.Now.AddSeconds(30 * retryTask.RetryCount);
                 }
 
-                if (actionsActions.Count == 0)
+                if (nextActions.Count == 0)
                 {
                     retryTask.Status = (int)RetryStatus.Done;
                 }
                 retryTask.UpdatedOn = DateTime.Now;
-                retryTask.NextActions = actionsActions.ToString();
+                retryTask.NextActions = nextActions.ToString();
                 retryTask.CompletedActions = completedDictionary.ToString();
                 retryTask.FailedActions = failedActions.ToString();
 
