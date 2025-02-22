@@ -5,6 +5,10 @@ VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetryMachine.Api", "RetryMachine.Api\RetryMachine.Api.csproj", "{CE734D7A-E5C8-4799-897E-7A83244F8B9A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetryMachine.SQL", "RetryMachine.SQL\RetryMachine.SQL.csproj", "{83D62186-925D-44E5-818D-AB406F5D8A1A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetryMachine", "RetryMachine\RetryMachine.csproj", "{620EB4EE-CF4A-7CFD-B4C4-2159A4B8281F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,8 +19,19 @@ Global
 		{CE734D7A-E5C8-4799-897E-7A83244F8B9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CE734D7A-E5C8-4799-897E-7A83244F8B9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE734D7A-E5C8-4799-897E-7A83244F8B9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83D62186-925D-44E5-818D-AB406F5D8A1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83D62186-925D-44E5-818D-AB406F5D8A1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83D62186-925D-44E5-818D-AB406F5D8A1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83D62186-925D-44E5-818D-AB406F5D8A1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{620EB4EE-CF4A-7CFD-B4C4-2159A4B8281F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{620EB4EE-CF4A-7CFD-B4C4-2159A4B8281F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{620EB4EE-CF4A-7CFD-B4C4-2159A4B8281F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{620EB4EE-CF4A-7CFD-B4C4-2159A4B8281F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {298641B5-5B18-4178-81E9-B0E3A2EA059F}
 	EndGlobalSection
 EndGlobal

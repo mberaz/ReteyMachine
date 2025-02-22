@@ -2,8 +2,8 @@
 {
     public enum RetryStatus
     {
-        Pending,
-        Error,
-        Done
+        Pending = 1,
+        Error = 10,
+        Done = 100
     }
 }

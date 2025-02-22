@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using RetryMachine.Api.RetryMachine;
+using RetryMachine;
 
 namespace RetryMachine.Api.Actions;
 
