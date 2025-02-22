@@ -2,15 +2,17 @@
 
 public interface IRetryMachine
 {
-    Task CreateTasks<T>( string actionName, T value);
-    Task CreateTasks( string actionName, string value);
+    Task CreateTasks<T>(string actionName, T value, bool runImmediately = false, RetrySettings? settings = null);
+    Task CreateTasks(string actionName, string value, bool runImmediately = false, RetrySettings? settings = null);
 
-    Task CreateTasks(RetryCreate task);
-    Task CreateTasks(List<RetryCreate> tasks);
+    Task CreateTasks(RetryCreate task, RetrySettings? settings = null);
+    Task CreateTasks(List<RetryCreate> tasks, RetrySettings? settings = null);
 
-    //Task CreateTasks(Dictionary<string, object> tasks);
-    //Task CreateTasks(Dictionary<string, string> tasks);
 
-    Task PerformTasks();
+    Task<int> PerformTasks();
 }
- 
+
+public class RetrySettings
+{
+    public int DelayInSeconds { get; set; }
+}

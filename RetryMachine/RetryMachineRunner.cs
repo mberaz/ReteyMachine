@@ -5,8 +5,8 @@ namespace RetryMachine
 {
     public class RetryMachineRunner : IRetryMachine
     {
-        private IRetryStorage _storage;
-        private List<IRetryable> _possibleActions;
+        private readonly IRetryStorage _storage;
+        private readonly List<IRetryable> _possibleActions;
 
         public RetryMachineRunner(IRetryStorage storage, IEnumerable<IRetryable> possibleActions)
         {
@@ -14,43 +14,75 @@ namespace RetryMachine
             _possibleActions = possibleActions.ToList();
         }
 
-        public Task CreateTasks<T>(string actionName, T value)
+        public Task CreateTasks<T>(string actionName, T value, bool runImmediately = false, RetrySettings? settings = null)
         {
-            return CreateTasks([new RetryCreate(actionName, JsonConvert.SerializeObject(value), 1)]);
+            return CreateTasks(
+                [new RetryCreate(actionName, JsonConvert.SerializeObject(value), 1, runImmediately)],
+                settings);
         }
 
-        public Task CreateTasks(string actionName, string value)
+        public Task CreateTasks(string actionName, string value, bool runImmediately = false, RetrySettings? settings = null)
         {
-            return CreateTasks([new RetryCreate(actionName, value, 1)]);
+            return CreateTasks([new RetryCreate(actionName, value, 1, runImmediately)],
+                settings);
         }
 
-        public Task CreateTasks(RetryCreate task)
+        public Task CreateTasks(RetryCreate task, RetrySettings? settings = null)
         {
-            return CreateTasks([task]);
+            return CreateTasks([task], settings);
         }
 
-        public async Task CreateTasks(List<RetryCreate> tasks)
+        public async Task CreateTasks(List<RetryCreate> tasks, RetrySettings? settings = null)
         {
+            settings ??= new RetrySettings { DelayInSeconds = 30 };
             var actions = new JObject();
             var actionOrder = new JObject();
 
+            var completedDictionary = new Dictionary<string, string>();
+            var failedActions = new Dictionary<string, string>();
+
+            var status = (int)RetryStatus.Pending;
+
             foreach (var task in tasks.OrderBy(o => o.Order))
             {
-                actions[task.TaskName] = task.Value;
-                actionOrder[task.TaskName] = task.Order;
+                if (task.RunImmediately)
+                {
+                    var taskToDo = _possibleActions.FirstOrDefault(f => f.Name() == task.TaskName);
+                    var result = await taskToDo.Perform(task.Value);
+
+                    if (result.isOk)
+                    {
+                        //do not add to the actionOrder or actions object tasks that are done
+                        completedDictionary[task.TaskName] = task.Value;
+                    }
+                    else
+                    {
+                        //if we fail on the task that runs immediately we start in an error status
+                        failedActions[task.TaskName] = result.error;
+                        status = (int)RetryStatus.Error;
+                    }
+                }
+                else
+                {
+                    actions[task.TaskName] = task.Value;
+                    actionOrder[task.TaskName] = task.Order;
+                }
             }
 
             await _storage.Save(new RetryTaskModel
             {
+                //if we executed all the tasks, then we are done
+                Status = actions.HasValues ? status : (int)RetryStatus.Done,
                 CreatedOn = DateTime.Now,
-                Status = (int)RetryStatus.Pending,
-                ActionOn = DateTime.Now.AddSeconds(30),
+                ActionOn = DateTime.Now.AddSeconds(settings.DelayInSeconds),
                 NextActions = JsonConvert.SerializeObject(actions),
-                ActionOrder = JsonConvert.SerializeObject(actionOrder)
+                ActionOrder = JsonConvert.SerializeObject(actionOrder),
+                CompletedActions = JsonConvert.SerializeObject(completedDictionary),
+                FailedActions = JsonConvert.SerializeObject(failedActions)
             });
         }
 
-        public async Task PerformTasks()
+        public async Task<int> PerformTasks()
         {
             var taskList = await _storage.Get();
 
@@ -58,6 +90,8 @@ namespace RetryMachine
             {
                 await DoTaskInner(task);
             }
+
+            return taskList.Count;
         }
 
         private async Task DoTaskInner(RetryTaskModel retryTaskModel)
@@ -67,7 +101,7 @@ namespace RetryMachine
             var completedDictionary = ToDictionary(retryTaskModel.CompletedActions);
             var failedActions = ToDictionary(retryTaskModel.FailedActions);
 
-            foreach (var order in nextActions.OrderBy(o => o.Value))
+            foreach (var order in actionOrder.OrderBy(o => o.Value))
             {
                 var action = nextActions[order.Key];
                 var taskToDo = _possibleActions.FirstOrDefault(f => f.Name() == order.Key);

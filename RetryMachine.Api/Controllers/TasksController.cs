@@ -31,10 +31,27 @@ namespace RetryMachine.Api.Controllers
             ]);
         }
 
-        [HttpGet("Run")]
-        public async Task Run()
+        [HttpGet("Immediately")]
+        public async Task Immediately()
         {
-            await _retryMachine.PerformTasks();
+            await _retryMachine.CreateTasks(
+            [
+                new RetryCreate( AutoLogAction.ActionName, new AutoLogSettings
+                {
+                    AccountHolderId = 11,
+                    Template = ""
+                },1,runImmediately:true),
+                new RetryCreate( UserActionLogAction.ActionName, new UserActionLogSettings
+                {
+                    ActionId = 11
+                },2)
+            ]);
+        }
+
+        [HttpGet("Run")]
+        public async Task<int> Run()
+        {
+            return await _retryMachine.PerformTasks();
         }
     }
 }
