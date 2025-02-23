@@ -3,7 +3,6 @@ using RetryMachine;
 using RetryMachine.Api.Actions;
 using RetryMachine.SQL.Models;
 using RetryMachine.SQL.Repositories;
-using RetryMachine.SQL.Storage;
 using RetryStorage = RetryMachine.Api.Storage.RetryStorage;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +16,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IRetryable, AutoLogAction>();
 builder.Services.AddScoped<IRetryable, UserActionLogAction>();
 
-builder.Services.AddScoped<IRetryMachine, RetryMachineRunner>();
+builder.Services.AddSingleton(new RetrySettings { DelayInSeconds = 30 });
+builder.Services.AddScoped<IRetryMachineRunner, RetryMachineRunner>();
+
 builder.Services.AddScoped<IRetryStorage, RetryStorage>();
 builder.Services.AddScoped<IRetryTaskRepository, RetryTaskRepository>();
 

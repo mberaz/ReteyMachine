@@ -7,9 +7,9 @@ namespace RetryMachine.Api.Controllers
     [Route("[controller]")]
     public class TasksController : ControllerBase
     {
-        private readonly IRetryMachine _retryMachine;
+        private readonly IRetryMachineRunner _retryMachine;
 
-        public TasksController(ILogger<TasksController> logger, IRetryMachine retryMachine)
+        public TasksController(ILogger<TasksController> logger, IRetryMachineRunner retryMachine)
         {
             _retryMachine = retryMachine;
         }

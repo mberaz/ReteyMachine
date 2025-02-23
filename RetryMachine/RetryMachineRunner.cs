@@ -3,10 +3,11 @@ using Newtonsoft.Json.Linq;
 
 namespace RetryMachine
 {
-    public class RetryMachineRunner : IRetryMachine
+    public class RetryMachineRunner : IRetryMachineRunner
     {
         private readonly IRetryStorage _storage;
         private readonly List<IRetryable> _possibleActions;
+        private readonly RetrySettings _settings;
 
         public RetryMachineRunner(IRetryStorage storage, IEnumerable<IRetryable> possibleActions)
         {
@@ -14,27 +15,24 @@ namespace RetryMachine
             _possibleActions = possibleActions.ToList();
         }
 
-        public Task CreateTasks<T>(string actionName, T value, bool runImmediately = false, RetrySettings? settings = null)
+        public Task CreateTasks<T>(string actionName, T value, bool runImmediately = false)
         {
             return CreateTasks(
-                [new RetryCreate(actionName, JsonConvert.SerializeObject(value), 1, runImmediately)],
-                settings);
+                [new RetryCreate(actionName, JsonConvert.SerializeObject(value), 1, runImmediately)]);
         }
 
-        public Task CreateTasks(string actionName, string value, bool runImmediately = false, RetrySettings? settings = null)
+        public Task CreateTasks(string actionName, string value, bool runImmediately = false)
         {
-            return CreateTasks([new RetryCreate(actionName, value, 1, runImmediately)],
-                settings);
+            return CreateTasks([new RetryCreate(actionName, value, 1, runImmediately)]);
         }
 
-        public Task CreateTasks(RetryCreate task, RetrySettings? settings = null)
+        public Task CreateTasks(RetryCreate task)
         {
-            return CreateTasks([task], settings);
+            return CreateTasks([task]);
         }
 
-        public async Task CreateTasks(List<RetryCreate> tasks, RetrySettings? settings = null)
+        public async Task CreateTasks(List<RetryCreate> tasks)
         {
-            settings ??= new RetrySettings { DelayInSeconds = 30 };
             var actions = new JObject();
             var actionOrder = new JObject();
 
@@ -74,7 +72,7 @@ namespace RetryMachine
                 //if we executed all the tasks, then we are done
                 Status = actions.HasValues ? status : (int)RetryStatus.Done,
                 CreatedOn = DateTime.Now,
-                ActionOn = DateTime.Now.AddSeconds(settings.DelayInSeconds),
+                ActionOn = DateTime.Now.AddSeconds(_settings.DelayInSeconds),
                 NextActions = JsonConvert.SerializeObject(actions),
                 ActionOrder = JsonConvert.SerializeObject(actionOrder),
                 CompletedActions = JsonConvert.SerializeObject(completedDictionary),
