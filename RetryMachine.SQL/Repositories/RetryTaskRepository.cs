@@ -3,14 +3,6 @@ using RetryMachine.SQL.Models;
 
 namespace RetryMachine.SQL.Repositories
 {
-    public interface IRetryTaskRepository
-    {
-        Task<List<RetryTask>> FindTasksToRun();
-        Task<RetryTask?> GetSingleAsync(long id);
-        Task Create(RetryTask taskModel);
-        Task Edit(RetryTask taskModel);
-    }
-
     public class RetryTaskRepository : EntityBaseRepository<RetryTaskModel>, IRetryTaskRepository
     {
         private readonly RetrymachineContext _context;
@@ -46,7 +38,7 @@ namespace RetryMachine.SQL.Repositories
             task.Status = taskModel.Status;
             task.UpdatedOn = DateTime.Now;
             task.ActionOn = taskModel.ActionOn;
-
+            task.ActionOrder = taskModel.ActionOrder;
             task.NextActions = taskModel.NextActions;
             task.CompletedActions = taskModel.CompletedActions;
             task.FailedActions = taskModel.FailedActions;

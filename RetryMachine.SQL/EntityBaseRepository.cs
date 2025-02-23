@@ -8,7 +8,7 @@ namespace RetryMachine.SQL
              where T : class, new()
     {
 
-        private RetrymachineContext _context;
+        private readonly RetrymachineContext _context;
 
         #region Properties
         public EntityBaseRepository(RetrymachineContext context)
