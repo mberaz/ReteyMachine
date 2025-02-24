@@ -23,11 +23,11 @@ namespace RetryMachine.Api.Controllers
                 {
                     AccountHolderId = 11,
                     Template = ""
-                },1),
+                },order : 1),
                 new RetryCreate( UserActionLogAction.ActionName, new UserActionLogSettings
                 {
                     ActionId = 11
-                },2)
+                },order : 2)
             ]);
         }
 
@@ -40,11 +40,11 @@ namespace RetryMachine.Api.Controllers
                 {
                     AccountHolderId = 11,
                     Template = ""
-                },1,runImmediately:true),
+                },order: 1,runImmediately:true),
                 new RetryCreate( UserActionLogAction.ActionName, new UserActionLogSettings
                 {
                     ActionId = 11
-                },2)
+                },order:2)
             ]);
         }
 
