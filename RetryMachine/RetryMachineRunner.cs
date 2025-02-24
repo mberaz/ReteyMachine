@@ -56,9 +56,10 @@ namespace RetryMachine
                     }
                     else
                     {
-                        //if we fail on the task that runs immediately we start in an error status
                         failedActions[task.TaskName] = result.error;
-                        status = (int)RetryStatus.Error;
+                        actions[task.TaskName] = task.Settings;
+                        actionOrder[task.TaskName] = task.Order;
+                        status = (int)RetryStatus.Error; //if we fail on the task that runs immediately we start in an error status
                     }
                 }
                 else
