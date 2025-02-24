@@ -9,16 +9,16 @@ namespace RetryMachine
         {
         }
 
-        public RetryCreate(string taskName, string value, int order, bool runImmediately = false)
+        public RetryCreate(string taskName, string settings, int order, bool runImmediately = false)
         {
             TaskName = taskName;
-            Value = value;
+            Settings = settings;
             Order = order;
             RunImmediately = runImmediately;
         }
 
         public string TaskName { get; set; }
-        public string Value { get; set; }
+        public string Settings { get; set; }
         public int Order { get; set; }
         public bool RunImmediately { get; set; }
     }

@@ -8,7 +8,7 @@ namespace RetryMachine.Api.Actions
         public string Template { get; set; }
     }
 
-    public class AutoLogAction:IRetryable
+    public class AutoLogAction : IRetryable
     {
         public const string ActionName = "AutoLogAction";
         public string Name()
@@ -16,17 +16,17 @@ namespace RetryMachine.Api.Actions
             return ActionName;
         }
 
-        public Task<(bool isOk, string error)> Perform(string value)
+        public Task<(bool isOk, string? error)> Perform(string value)
         {
             var settings = JsonConvert.DeserializeObject<AutoLogSettings>(value);
 
             try
             {
-                return Task.FromResult<(bool isOk, string error)>((true, null));
+                return Task.FromResult<(bool isOk, string? error)>((true, null));
             }
             catch (Exception e)
             {
-                return Task.FromResult((false, e.Message));
+                return Task.FromResult<(bool isOk, string? error)>((true, e.Message));
             }
         }
     }

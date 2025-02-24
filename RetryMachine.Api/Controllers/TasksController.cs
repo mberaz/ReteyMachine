@@ -19,15 +19,8 @@ namespace RetryMachine.Api.Controllers
         {
             await _retryMachine.CreateTasks(
             [
-                new RetryCreate( AutoLogAction.ActionName, new AutoLogSettings
-                {
-                    AccountHolderId = 11,
-                    Template = ""
-                },order : 1),
-                new RetryCreate( UserActionLogAction.ActionName, new UserActionLogSettings
-                {
-                    ActionId = 11
-                },order : 2)
+                new RetryCreate( AutoLogAction.ActionName, new AutoLogSettings { AccountHolderId = 11, Template = "" },order : 1),
+                new RetryCreate( UserActionLogAction.ActionName, new UserActionLogSettings { ActionId = 11 },order : 2)
             ]);
         }
 
@@ -36,22 +29,17 @@ namespace RetryMachine.Api.Controllers
         {
             await _retryMachine.CreateTasks(
             [
-                new RetryCreate( AutoLogAction.ActionName, new AutoLogSettings
-                {
-                    AccountHolderId = 11,
-                    Template = ""
-                },order: 1,runImmediately:true),
-                new RetryCreate( UserActionLogAction.ActionName, new UserActionLogSettings
-                {
-                    ActionId = 11
-                },order:2)
+                new RetryCreate( AutoLogAction.ActionName, new AutoLogSettings { AccountHolderId = 11, Template = "" },
+                    order : 1, runImmediately:true),
+                new RetryCreate( UserActionLogAction.ActionName, new UserActionLogSettings { ActionId = 11 },order : 2)
             ]);
         }
 
         [HttpGet("Run")]
-        public async Task<int> Run()
+        public Task<int> Run()
         {
-            return await _retryMachine.PerformTasks();
+            //call from a scheduler
+            return _retryMachine.PerformTasks();
         }
     }
 }

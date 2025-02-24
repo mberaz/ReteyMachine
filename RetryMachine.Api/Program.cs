@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using RetryMachine;
 using RetryMachine.Api.Actions;
+using RetryMachine.Api.Storage;
 using RetryMachine.SQL.Models;
 using RetryMachine.SQL.Repositories;
-using RetryStorage = RetryMachine.Api.Storage.RetryStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +19,7 @@ builder.Services.AddScoped<IRetryable, UserActionLogAction>();
 builder.Services.AddSingleton(new RetrySettings { DelayInSeconds = 30 });
 builder.Services.AddScoped<IRetryMachineRunner, RetryMachineRunner>();
 
-builder.Services.AddScoped<IRetryStorage, RetryStorage>();
+builder.Services.AddScoped<IRetryStorage, ServiceRetryStorage>();
 builder.Services.AddScoped<IRetryTaskRepository, RetryTaskRepository>();
 
 var connectionString = "";

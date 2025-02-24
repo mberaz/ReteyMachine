@@ -9,26 +9,26 @@ namespace RetryMachine
         private readonly List<IRetryable> _possibleActions;
         private readonly RetrySettings _settings;
 
-        public RetryMachineRunner(IRetryStorage storage, IEnumerable<IRetryable> possibleActions)
+        public RetryMachineRunner(IRetryStorage storage, IEnumerable<IRetryable> possibleActions, RetrySettings settings)
         {
             _storage = storage;
+            _settings = settings;
             _possibleActions = possibleActions.ToList();
         }
 
         public Task CreateTasks<T>(string actionName, T value, bool runImmediately = false)
         {
-            return CreateTasks(
-                [new RetryCreate(actionName, JsonConvert.SerializeObject(value), 1, runImmediately)]);
+            return CreateTasks(new RetryCreate(actionName, JsonConvert.SerializeObject(value), 1, runImmediately));
         }
 
         public Task CreateTasks(string actionName, string value, bool runImmediately = false)
         {
-            return CreateTasks([new RetryCreate(actionName, value, 1, runImmediately)]);
+            return CreateTasks(new RetryCreate(actionName, value, 1, runImmediately));
         }
 
-        public Task CreateTasks(RetryCreate task)
+        public Task CreateTasks(params RetryCreate[] tasks)
         {
-            return CreateTasks([task]);
+            return CreateTasks(tasks.ToList());
         }
 
         public async Task CreateTasks(List<RetryCreate> tasks)
@@ -46,12 +46,12 @@ namespace RetryMachine
                 if (task.RunImmediately)
                 {
                     var taskToDo = _possibleActions.FirstOrDefault(f => f.Name() == task.TaskName);
-                    var result = await taskToDo.Perform(task.Value);
+                    var result = await taskToDo.Perform(task.Settings);
 
                     if (result.isOk)
                     {
                         //do not add to the actionOrder or actions object tasks that are done
-                        completedDictionary[task.TaskName] = task.Value;
+                        completedDictionary[task.TaskName] = task.Settings;
                     }
                     else
                     {
@@ -62,7 +62,7 @@ namespace RetryMachine
                 }
                 else
                 {
-                    actions[task.TaskName] = task.Value;
+                    actions[task.TaskName] = task.Settings;
                     actionOrder[task.TaskName] = task.Order;
                 }
             }

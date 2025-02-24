@@ -3,11 +3,11 @@ using RetryMachine.SQL.Repositories;
 
 namespace RetryMachine.Api.Storage
 {
-    public class RetryStorage : IRetryStorage
+    public class ServiceRetryStorage : IRetryStorage
     {
         private readonly IRetryTaskRepository _repository;
 
-        public RetryStorage(IRetryTaskRepository repository)
+        public ServiceRetryStorage(IRetryTaskRepository repository)
         {
             _repository = repository;
         }
