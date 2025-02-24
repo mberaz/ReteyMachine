@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace RetryMachine
 {
@@ -18,17 +19,17 @@ namespace RetryMachine
 
         public Task CreateTasks<T>(string actionName, T value, bool runImmediately = false)
         {
-            return CreateTasks(new RetryCreate(actionName, JsonConvert.SerializeObject(value), 1, runImmediately));
+            return CreateTasks([new RetryCreate(actionName, JsonConvert.SerializeObject(value), 1, runImmediately)]);
         }
 
         public Task CreateTasks(string actionName, string value, bool runImmediately = false)
         {
-            return CreateTasks(new RetryCreate(actionName, value, 1, runImmediately));
+            return CreateTasks([new RetryCreate(actionName, value, 1, runImmediately)]);
         }
 
-        public Task CreateTasks(params RetryCreate[] tasks)
+        public Task CreateTasks(RetryCreate tasks)
         {
-            return CreateTasks(tasks.ToList());
+            return CreateTasks([tasks]);
         }
 
         public async Task CreateTasks(List<RetryCreate> tasks)
