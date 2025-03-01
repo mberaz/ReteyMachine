@@ -85,28 +85,17 @@ namespace RetryMachine.SQL.Repositories
 
         public async Task Edit(RetryTask taskModel)
         {
-            try
-            {
+            var task = await GetSingleAsync(taskModel.Id);
+            task.RetryCount = taskModel.RetryCount;
+            task.Status = taskModel.Status;
+            task.UpdatedOn = DateTime.Now;
+            task.ActionOn = taskModel.ActionOn;
+            task.ActionOrder = SaveAsBase64 ? Base64Encode(taskModel.ActionOrder) : taskModel.ActionOrder;
+            task.NextActions = SaveAsBase64 ? Base64Encode(taskModel.NextActions) : taskModel.NextActions;
+            task.CompletedActions = SaveAsBase64 ? Base64Encode(taskModel.CompletedActions) : taskModel.CompletedActions;
+            task.FailedActions = SaveAsBase64 ? Base64Encode(taskModel.FailedActions) : taskModel.FailedActions;
 
-
-                var task = await GetSingleAsync(taskModel.Id);
-                task.RetryCount = taskModel.RetryCount;
-                task.Status = taskModel.Status;
-                task.UpdatedOn = DateTime.Now;
-                task.ActionOn = taskModel.ActionOn;
-                task.ActionOrder = SaveAsBase64 ? Base64Encode(taskModel.ActionOrder) : taskModel.ActionOrder;
-                task.NextActions = SaveAsBase64 ? Base64Encode(taskModel.NextActions) : taskModel.NextActions;
-                task.CompletedActions = SaveAsBase64 ? Base64Encode(taskModel.CompletedActions) : taskModel.CompletedActions;
-                task.FailedActions = SaveAsBase64 ? Base64Encode(taskModel.FailedActions) : taskModel.FailedActions;
-
-                await _context.SaveChangesAsync();
-
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            await _context.SaveChangesAsync();
         }
     }
 }
