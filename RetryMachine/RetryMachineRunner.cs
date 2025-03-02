@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
 
 namespace RetryMachine
 {
@@ -121,19 +120,19 @@ namespace RetryMachine
                     retryTaskModel.RetryCount += 1;
                     retryTaskModel.ActionOn = DateTime.Now.AddSeconds(30 * retryTaskModel.RetryCount);
                 }
-
-                if (nextActions.Count == 0)
-                {
-                    retryTaskModel.Status = (int)RetryStatus.Done;
-                }
-
-                retryTaskModel.UpdatedOn = DateTime.Now;
-                retryTaskModel.NextActions = JsonConvert.SerializeObject(nextActions);
-                retryTaskModel.CompletedActions = JsonConvert.SerializeObject(completedDictionary);
-                retryTaskModel.FailedActions = JsonConvert.SerializeObject(failedActions);
-
-                await _storage.Update(retryTaskModel);
             }
+
+            if (nextActions.Count == 0)
+            {
+                retryTaskModel.Status = (int)RetryStatus.Done;
+            }
+
+            retryTaskModel.UpdatedOn = DateTime.Now;
+            retryTaskModel.NextActions = JsonConvert.SerializeObject(nextActions);
+            retryTaskModel.CompletedActions = JsonConvert.SerializeObject(completedDictionary);
+            retryTaskModel.FailedActions = JsonConvert.SerializeObject(failedActions);
+
+            await _storage.Update(retryTaskModel);
         }
 
         private Dictionary<string, string> ToDictionary(string? values)
