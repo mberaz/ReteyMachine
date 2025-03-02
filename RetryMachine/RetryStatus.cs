@@ -1,9 +1,8 @@
-﻿namespace RetryMachine
+﻿namespace RetryMachine;
+
+public enum RetryStatus
 {
-    public enum RetryStatus
-    {
-        Pending = 1,
-        Error = 10,
-        Done = 100
-    }
+    Pending = 1,
+    Error = 10,
+    Done = 100
 }
