@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using FakeItEasy;
+﻿using FakeItEasy;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RetryMachine;
@@ -13,7 +12,6 @@ namespace UnitTests
     {
         private IRetryMachineRunner _retryMachine;
 
-        
         [TestInitialize]
         public void TestInitialize()
         {
@@ -28,7 +26,8 @@ namespace UnitTests
 
             await service.Stuff();
 
-            A.CallTo(() => _retryMachine.CreateTasks(A<List<RetryCreate>>.That.Matches(l => MatchTaskList(l)))).MustHaveHappened();
+            A.CallTo(() => _retryMachine.CreateTasks(A<List<RetryCreate>>.That.
+                Matches(l => MatchTaskList(l)))).MustHaveHappened();
         }
 
         [TestMethod]
@@ -65,8 +64,7 @@ namespace UnitTests
         {
             var calls = Fake.GetCalls(retryMachine).ToList();
 
-            var args = calls.First().Arguments[0];
-            return args as List<RetryCreate>;
+            return calls.First().Arguments.Get<List<RetryCreate>>("tasks");
         }
     }
 }
