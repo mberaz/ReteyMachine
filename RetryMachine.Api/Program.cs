@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using RetryMachine;
 using RetryMachine.Api.Actions;
+using RetryMachine.Api.Service;
 using RetryMachine.Api.Storage;
 using RetryMachine.SQL.Models;
 using RetryMachine.SQL.Repositories;
@@ -21,6 +22,8 @@ builder.Services.AddScoped<IRetryMachineRunner, RetryMachineRunner>();
 
 builder.Services.AddScoped<IRetryStorage, ServiceRetryStorage>();
 builder.Services.AddScoped<IRetryTaskRepository, RetryTaskRepository>();
+
+builder.Services.AddScoped<IRandomService, RandomService>();
 
 var connectionString = "";
 

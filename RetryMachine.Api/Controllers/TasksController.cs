@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RetryMachine.Api.Actions;
+using RetryMachine.Api.Service;
 
 namespace RetryMachine.Api.Controllers
 {
@@ -7,32 +8,25 @@ namespace RetryMachine.Api.Controllers
     [Route("[controller]")]
     public class TasksController : ControllerBase
     {
+        private readonly IRandomService _service;
         private readonly IRetryMachineRunner _retryMachine;
 
-        public TasksController(ILogger<TasksController> logger, IRetryMachineRunner retryMachine)
+        public TasksController(IRandomService service, IRetryMachineRunner retryMachine)
         {
+            _service = service;
             _retryMachine = retryMachine;
         }
 
         [HttpGet("Set")]
         public async Task Set()
         {
-            await _retryMachine.CreateTasks(
-            [
-                new RetryCreate( AutoLogAction.ActionName, new AutoLogSettings { AccountHolderId = 11, Template = "" },order : 1),
-                new RetryCreate( UserActionLogAction.ActionName, new UserActionLogSettings { ActionId = 11 },order : 2)
-            ]);
+            await _service.Stuff();
         }
 
         [HttpGet("Immediately")]
         public async Task Immediately()
         {
-            await _retryMachine.CreateTasks(
-            [
-                new RetryCreate( AutoLogAction.ActionName, new AutoLogSettings { AccountHolderId = 11, Template = "" },
-                    order : 1, runImmediately:true),
-                new RetryCreate( UserActionLogAction.ActionName, new UserActionLogSettings { ActionId = 11 },order : 2)
-            ]);
+            await _service.Fast();
         }
 
         [HttpGet("Run")]
