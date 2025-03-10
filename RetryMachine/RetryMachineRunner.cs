@@ -16,22 +16,24 @@ namespace RetryMachine
             _possibleActions = possibleActions.ToList();
         }
 
-        public Task CreateTasks<T>(string actionName, T value, bool runImmediately = false)
+        public Task CreateTasks<T>(string actionName, T value, bool runImmediately = false, string taskName = "", string? taskId = null)
         {
-            return CreateTasks([new RetryCreate(actionName, JsonConvert.SerializeObject(value), 1, runImmediately)]);
+            return CreateTasks(
+                [new RetryCreate(actionName, JsonConvert.SerializeObject(value), 1, runImmediately)],
+                taskName, taskId);
         }
 
-        public Task CreateTasks(string actionName, string value, bool runImmediately = false)
+        public Task CreateTasks(string actionName, string value, bool runImmediately = false, string taskName = "", string? taskId = null)
         {
-            return CreateTasks([new RetryCreate(actionName, value, 1, runImmediately)]);
+            return CreateTasks([new RetryCreate(actionName, value, 1, runImmediately)], taskName, taskId);
         }
 
-        public Task CreateTasks(RetryCreate tasks)
+        public Task CreateTasks(RetryCreate tasks, string taskName = "", string? taskId = null)
         {
-            return CreateTasks([tasks]);
+            return CreateTasks([tasks], taskName, taskId);
         }
 
-        public async Task CreateTasks(List<RetryCreate> tasks)
+        public async Task CreateTasks(List<RetryCreate> tasks, string taskName = "", string? taskId = null)
         {
             var actions = new JObject();
             var actionOrder = new JObject();
@@ -41,12 +43,14 @@ namespace RetryMachine
 
             var status = (int)RetryStatus.Pending;
 
+            taskId ??= Guid.NewGuid().ToString("N");
+
             foreach (var task in tasks.OrderBy(o => o.Order))
             {
                 if (task.RunImmediately)
                 {
                     var taskToDo = _possibleActions.FirstOrDefault(f => f.Name() == task.TaskName);
-                    var result = await taskToDo.Perform(task.Settings);
+                    var result = await taskToDo.Perform(task.Settings, taskName, taskId);
 
                     if (result.isOk)
                     {
@@ -70,6 +74,8 @@ namespace RetryMachine
 
             await _storage.Save(new RetryTaskModel
             {
+                TaskName = taskName,
+                TaskId = taskId,
                 //if we executed all the tasks, then we are done
                 Status = actions.HasValues ? status : (int)RetryStatus.Done,
                 CreatedOn = DateTime.Now,
@@ -104,7 +110,7 @@ namespace RetryMachine
             {
                 var action = nextActions[order.Key];
                 var taskToDo = _possibleActions.FirstOrDefault(f => f.Name() == order.Key);
-                var result = await taskToDo.Perform(action);
+                var result = await taskToDo.Perform(action, retryTaskModel.TaskName, retryTaskModel.TaskId);
 
                 if (result.isOk)
                 {

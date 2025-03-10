@@ -7,7 +7,7 @@ public class UserActionLogSettings
     public int ActionId { get; set; }
 }
 
-public class UserActionLogAction:IRetryable
+public class UserActionLogAction : IRetryable
 {
     public const string ActionName = "UserActionLogAction";
     public string Name()
@@ -15,7 +15,7 @@ public class UserActionLogAction:IRetryable
         return ActionName;
     }
 
-    public Task<(bool isOk, string? error)> Perform(string value)
+    public Task<(bool isOk, string? error)> Perform(string value, string taskName = "", string? taskId = null)
     {
         var settings = JsonConvert.DeserializeObject<UserActionLogSettings>(value);
 

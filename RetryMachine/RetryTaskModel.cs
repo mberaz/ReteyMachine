@@ -12,4 +12,7 @@ public class RetryTaskModel
     public string NextActions { get; set; }
     public string CompletedActions { get; set; }
     public string FailedActions { get; set; }
+
+    public string TaskName {get;set;}
+    public string TaskId {get;set;}
 }

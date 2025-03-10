@@ -16,7 +16,7 @@ namespace RetryMachine.Api.Actions
             return ActionName;
         }
 
-        public Task<(bool isOk, string? error)> Perform(string value)
+        public Task<(bool isOk, string? error)> Perform(string value, string taskName = "", string? taskId = null)
         {
             var settings = JsonConvert.DeserializeObject<AutoLogSettings>(value);
 
