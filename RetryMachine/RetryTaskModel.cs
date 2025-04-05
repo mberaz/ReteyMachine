@@ -2,7 +2,6 @@
 
 public class RetryTaskModel
 {
-    public long Id { get; set; }
     public int RetryCount { get; set; }
     public int Status { get; set; }
     public DateTime CreatedOn { get; set; }
@@ -15,4 +14,6 @@ public class RetryTaskModel
 
     public string TaskName {get;set;}
     public string TaskId {get;set;}
+
+    public string? ExternalId {get;set;}
 }

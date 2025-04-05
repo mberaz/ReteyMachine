@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using RetryMachine.Api.Actions;
 using RetryMachine.Api.Service;
 
 namespace RetryMachine.Api.Controllers

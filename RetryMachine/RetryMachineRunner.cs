@@ -50,6 +50,11 @@ namespace RetryMachine
                 if (task.RunImmediately)
                 {
                     var taskToDo = _possibleActions.FirstOrDefault(f => f.Name() == task.TaskName);
+                    if (taskToDo == null)
+                    {
+                        throw new Exception($"Could not find a IRetryable implementation to execute the task: {task.TaskName}");
+                    }
+
                     var result = await taskToDo.Perform(task.Settings, taskName, taskId);
 
                     if (result.isOk)
@@ -110,6 +115,12 @@ namespace RetryMachine
             {
                 var action = nextActions[order.Key];
                 var taskToDo = _possibleActions.FirstOrDefault(f => f.Name() == order.Key);
+
+                if (taskToDo == null)
+                {
+                    throw new Exception($"Could not find a IRetryable implementation to execute the task: {order.Key}");
+                }
+
                 var result = await taskToDo.Perform(action, retryTaskModel.TaskName, retryTaskModel.TaskId);
 
                 if (result.isOk)
