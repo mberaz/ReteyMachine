@@ -47,17 +47,17 @@ namespace UnitTests
 
         private bool MatchTaskList(List<RetryCreate>? list)
         {
-            var autoLogsTask = list.FirstOrDefault(l => l.TaskName == AutoLogAction.ActionName);
-            Assert.IsNotNull(autoLogsTask);
-            Assert.AreEqual(autoLogsTask.Order, 1);
-            var autoLogsSettings = JObject.Parse(autoLogsTask.Settings);
-            Assert.AreEqual(autoLogsSettings.Value<int>("AccountHolderId"), 11);
+            var LogsTask = list.FirstOrDefault(l => l.TaskName == LogAction.ActionName);
+            Assert.IsNotNull(LogsTask);
+            Assert.AreEqual(LogsTask.Order, 1);
+            var LogsSettings = JObject.Parse(LogsTask.Settings);
+            Assert.AreEqual(LogsSettings.Value<int>("AccountId"), 11);
 
-            var ualTask = list.FirstOrDefault(l => l.TaskName == UserActionLogAction.ActionName);
-            Assert.IsNotNull(ualTask);
-            Assert.AreEqual(ualTask.Order, 2);
-            var ualSettings = JsonConvert.DeserializeObject<UserActionLogSettings>(ualTask.Settings);
-            Assert.AreEqual(ualSettings.ActionId, 11);
+            var monitorTask = list.FirstOrDefault(l => l.TaskName == MonitoringAction.ActionName);
+            Assert.IsNotNull(monitorTask);
+            Assert.AreEqual(monitorTask.Order, 2);
+            var monitorSettings = JsonConvert.DeserializeObject<MonitoringSettings>(monitorTask.Settings);
+            Assert.AreEqual(monitorSettings.ActionId, 11);
 
             return true;
         }

@@ -1,6 +1,7 @@
 using RetryMachine;
 using RetryMachine.Api.Actions;
 using RetryMachine.Api.Service;
+using RetryMachine.Api.Sevices;
 using RetryMachine.Api.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,8 +12,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IRetryable, AutoLogAction>();
-builder.Services.AddScoped<IRetryable, UserActionLogAction>();
+builder.Services.AddScoped<IRetryable, LogAction>();
+builder.Services.AddScoped<IRetryable, MonitoringAction>();
 
 builder.Services.AddSingleton(new RetrySettings { DelayInSeconds = 30 });
 builder.Services.AddScoped<IRetryMachineRunner, RetryMachineRunner>();
@@ -20,6 +21,8 @@ builder.Services.AddScoped<IRetryMachineRunner, RetryMachineRunner>();
 builder.Services.AddScoped<IRetryStorage, AzureQueueStorage>();
 
 builder.Services.AddScoped<IRandomService, RandomService>();
+builder.Services.AddScoped<ILogService, LogService>();
+builder.Services.AddScoped<IMonitoringService, MonitoringService>();
 
 var app = builder.Build();
 
