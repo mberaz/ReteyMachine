@@ -33,7 +33,7 @@ namespace RetryMachine
 
         public async Task CreateTasks(List<RetryCreate> tasks, string taskName = "", string? taskId = null)
         {
-            var actions = new JObject();
+            var nextActions = new JObject();
             var actionOrder = new JObject();
 
             var completedDictionary = new Dictionary<string, string>();
@@ -63,14 +63,14 @@ namespace RetryMachine
                     else
                     {
                         failedActions[task.TaskName] = result.error;
-                        actions[task.TaskName] = task.Settings;
+                        nextActions[task.TaskName] = task.Settings;
                         actionOrder[task.TaskName] = task.Order;
                         status = (int)RetryStatus.Error; //if we fail on the task that runs immediately we start in an error status
                     }
                 }
                 else
                 {
-                    actions[task.TaskName] = task.Settings;
+                    nextActions[task.TaskName] = task.Settings;
                     actionOrder[task.TaskName] = task.Order;
                 }
             }
@@ -80,9 +80,9 @@ namespace RetryMachine
                 TaskName = taskName,
                 TaskId = taskId,
                 //if we executed all the tasks, then we are done
-                Status = actions.HasValues ? status : (int)RetryStatus.Done,
+                Status = nextActions.HasValues ? status : (int)RetryStatus.Done,
                 CreatedOn = DateTime.Now,
-                NextActions = JsonConvert.SerializeObject(actions),
+                NextActions = JsonConvert.SerializeObject(nextActions),
                 ActionOrder = JsonConvert.SerializeObject(actionOrder),
                 CompletedActions = JsonConvert.SerializeObject(completedDictionary),
                 FailedActions = JsonConvert.SerializeObject(failedActions)
