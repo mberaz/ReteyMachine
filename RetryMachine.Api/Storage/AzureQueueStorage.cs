@@ -6,7 +6,6 @@ namespace RetryMachine.Api.Storage;
 
 public class AzureQueueStorage : IRetryStorage
 {
-    //https://learn.microsoft.com/en-us/azure/storage/queues/storage-quickstart-queues-dotnet?tabs=passwordless%2Croles-azure-portal%2Cenvironment-variable-windows%2Csign-in-azure-cli
     private const string queueName = "retry-q";
     private const string delimiter = ";";
     private const int maxRetryCounter = 5;
