@@ -131,13 +131,17 @@ namespace RetryMachine
                 {
                     failedActions[order.Key] = result.error;
                     retryTaskModel.Status = (int)RetryStatus.Error;
-                    retryTaskModel.RetryCount += 1;
                 }
             }
 
             if (nextActions.Count == 0)
             {
                 retryTaskModel.Status = (int)RetryStatus.Done;
+            }
+
+            if(retryTaskModel.Status==(int)RetryStatus.Error)
+            {
+                retryTaskModel.RetryCount += 1;
             }
 
             retryTaskModel.UpdatedOn = DateTime.Now;
