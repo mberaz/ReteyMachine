@@ -7,12 +7,10 @@ namespace RetryMachine
     {
         private readonly IRetryStorage _storage;
         private readonly List<IRetryable> _possibleActions;
-        private readonly RetrySettings _settings;
 
-        public RetryMachineRunner(IRetryStorage storage, IEnumerable<IRetryable> possibleActions, RetrySettings settings)
+        public RetryMachineRunner(IRetryStorage storage, IEnumerable<IRetryable> possibleActions)
         {
             _storage = storage;
-            _settings = settings;
             _possibleActions = possibleActions.ToList();
         }
 
@@ -84,7 +82,6 @@ namespace RetryMachine
                 //if we executed all the tasks, then we are done
                 Status = actions.HasValues ? status : (int)RetryStatus.Done,
                 CreatedOn = DateTime.Now,
-                ActionOn = DateTime.Now.AddSeconds(_settings.DelayInSeconds),
                 NextActions = JsonConvert.SerializeObject(actions),
                 ActionOrder = JsonConvert.SerializeObject(actionOrder),
                 CompletedActions = JsonConvert.SerializeObject(completedDictionary),
@@ -135,7 +132,6 @@ namespace RetryMachine
                     failedActions[order.Key] = result.error;
                     retryTaskModel.Status = (int)RetryStatus.Error;
                     retryTaskModel.RetryCount += 1;
-                    retryTaskModel.ActionOn = DateTime.Now.AddSeconds(30 * retryTaskModel.RetryCount);
                 }
             }
 
