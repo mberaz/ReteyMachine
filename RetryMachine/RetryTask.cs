@@ -1,6 +1,6 @@
 ﻿namespace RetryMachine;
 
-public class RetryTaskModel
+public class RetryTask
 {
     public int RetryCount { get; set; }
     public int Status { get; set; }

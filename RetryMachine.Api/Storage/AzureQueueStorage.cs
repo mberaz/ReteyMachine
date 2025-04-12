@@ -19,12 +19,12 @@ public class AzureQueueStorage : IRetryStorage
         _queueClient = new QueueClient(connectionString, queueName);
     }
 
-    public Task Save(RetryTaskModel retryTaskModel)
+    public Task Save(RetryTask retryTaskModel)
     {
         return _queueClient.SendMessageAsync(JsonConvert.SerializeObject(retryTaskModel));
     }
 
-    public async Task Update(RetryTaskModel retryTaskModel)
+    public async Task Update(RetryTask retryTaskModel)
     {
         if (retryTaskModel.ExternalId != null)
         {
@@ -39,13 +39,13 @@ public class AzureQueueStorage : IRetryStorage
         }
     }
 
-    public async Task<List<RetryTaskModel>> Get()
+    public async Task<List<RetryTask>> Get()
     {
         QueueMessage[] messages = await _queueClient.ReceiveMessagesAsync(maxMessages: numberOfItemsToGet);
 
         return messages.Select(m =>
         {
-            var item = m.Body.ToObjectFromJson<RetryTaskModel>();
+            var item = m.Body.ToObjectFromJson<RetryTask>();
             item.ExternalId = CreateExternalId(m);
             return item;
         }).ToList();

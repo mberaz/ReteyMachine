@@ -77,7 +77,7 @@ namespace RetryMachine
                 }
             }
 
-            await _storage.Save(new RetryTaskModel
+            await _storage.Save(new RetryTask
             {
                 TaskName = taskName,
                 TaskId = taskId,
@@ -104,7 +104,7 @@ namespace RetryMachine
             return taskList.Count;
         }
 
-        private async Task DoTaskInner(RetryTaskModel retryTaskModel)
+        private async Task DoTaskInner(RetryTask retryTaskModel)
         {
             var actionOrder = JsonConvert.DeserializeObject<Dictionary<string, int>>(retryTaskModel.ActionOrder);
             var nextActions = ToDictionary(retryTaskModel.NextActions);
