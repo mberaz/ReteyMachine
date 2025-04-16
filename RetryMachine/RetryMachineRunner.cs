@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace RetryMachine
 {
@@ -99,14 +100,17 @@ namespace RetryMachine
 
         public async Task<int> PerformTasks()
         {
-            var taskList = await _storage.Get();
+            return await PerformTasks(await _storage.Get());
+        }
 
-            foreach (var task in taskList)
+        public async Task<int> PerformTasks(List<RetryFlow> flows)
+        {
+            foreach (var task in flows)
             {
                 await DoTaskInner(task);
             }
 
-            return taskList.Count;
+            return flows.Count;
         }
 
         private async Task DoTaskInner(RetryFlow retryFlow)

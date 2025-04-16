@@ -10,6 +10,8 @@ public interface IRetryMachineRunner
     Task CreateTasks(List<RetryAction> tasks, string taskName = "", string? taskId = null);
 
     Task<int> PerformTasks();
+
+    Task<int> PerformTasks(List<RetryFlow> flows);
 }
 
 public class RetrySettings
