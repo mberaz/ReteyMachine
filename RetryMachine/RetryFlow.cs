@@ -1,6 +1,6 @@
 ﻿namespace RetryMachine;
 
-public class RetryTask
+public class RetryFlow
 {
     public int RetryCount { get; set; }
     public int Status { get; set; }
@@ -16,6 +16,6 @@ public class RetryTask
     public string TaskName {get;set;}
     public string TaskId {get;set;}
 
-    //RetryTask id in our selected method of storage
+    //RetryFlow id in our selected method of storage
     public string? ExternalId {get;set;}
 }

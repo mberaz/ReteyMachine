@@ -18,33 +18,33 @@ public class AzureQueueStorage : IRetryStorage
         _queueClient = new QueueClient(connectionString, queueName);
     }
 
-    public Task Save(RetryTask retryTaskModel)
+    public Task Save(RetryFlow retryFlowModel)
     {
-        return _queueClient.SendMessageAsync(JsonConvert.SerializeObject(retryTaskModel));
+        return _queueClient.SendMessageAsync(JsonConvert.SerializeObject(retryFlowModel));
     }
 
-    public async Task Update(RetryTask retryTaskModel)
+    public async Task Update(RetryFlow retryFlowModel)
     {
-        if (retryTaskModel.ExternalId != null)
+        if (retryFlowModel.ExternalId != null)
         {
-            var (messageId, popReceipt) = SplitExternalId(retryTaskModel.ExternalId);
+            var (messageId, popReceipt) = SplitExternalId(retryFlowModel.ExternalId);
             await _queueClient.DeleteMessageAsync(messageId, popReceipt);
         }
 
         //we don't want to re-queue the task if it is done, or we have reached the max retry counter
-        if (retryTaskModel.Status != (int)RetryStatus.Done || retryTaskModel.RetryCount >= maxRetryCounter)
+        if (retryFlowModel.Status != (int)RetryStatus.Done || retryFlowModel.RetryCount >= maxRetryCounter)
         {
-            await _queueClient.SendMessageAsync(JsonConvert.SerializeObject(retryTaskModel));
+            await _queueClient.SendMessageAsync(JsonConvert.SerializeObject(retryFlowModel));
         }
     }
 
-    public async Task<List<RetryTask>> Get()
+    public async Task<List<RetryFlow>> Get()
     {
         QueueMessage[] messages = await _queueClient.ReceiveMessagesAsync(maxMessages: numberOfItemsToGet);
 
         return messages.Select(m =>
         {
-            var item = m.Body.ToObjectFromJson<RetryTask>();
+            var item = m.Body.ToObjectFromJson<RetryFlow>();
             item.ExternalId = CreateExternalId(m);
             return item;
         }).ToList();

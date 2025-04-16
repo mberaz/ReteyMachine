@@ -21,21 +21,21 @@ namespace UnitTests
         [TestMethod]
         public async Task Stuff_ThatMatches()
         {
-            A.CallTo(() => _retryMachine.CreateTasks(A<List<RetryCreate>>._, A<string>._, A<string>._))
+            A.CallTo(() => _retryMachine.CreateTasks(A<List<RetryAction>>._, A<string>._, A<string>._))
                 .Returns(Task.CompletedTask);
 
             var service = new RandomService(_retryMachine);
 
             await service.Stuff();
 
-            A.CallTo(() => _retryMachine.CreateTasks(A<List<RetryCreate>>.That.
+            A.CallTo(() => _retryMachine.CreateTasks(A<List<RetryAction>>.That.
                 Matches(l => MatchTaskList(l)), A<string>._, A<string>._)).MustHaveHappened();
         }
 
         [TestMethod]
         public async Task Stuff_GetArgs()
         {
-            A.CallTo(() => _retryMachine.CreateTasks(A<List<RetryCreate>>._, A<string>._, A<string>._)).Returns(Task.CompletedTask);
+            A.CallTo(() => _retryMachine.CreateTasks(A<List<RetryAction>>._, A<string>._, A<string>._)).Returns(Task.CompletedTask);
             var service = new RandomService(_retryMachine);
 
             await service.Stuff();
@@ -45,7 +45,7 @@ namespace UnitTests
             MatchTaskList(list);
         }
 
-        private bool MatchTaskList(List<RetryCreate>? list)
+        private bool MatchTaskList(List<RetryAction>? list)
         {
             var LogsTask = list.FirstOrDefault(l => l.TaskName == LogAction.ActionName);
             Assert.IsNotNull(LogsTask);
@@ -62,11 +62,11 @@ namespace UnitTests
             return true;
         }
 
-        private static List<RetryCreate>? GetArgs(IRetryMachineRunner retryMachine)
+        private static List<RetryAction>? GetArgs(IRetryMachineRunner retryMachine)
         {
             var calls = Fake.GetCalls(retryMachine).ToList();
 
-            return calls.First().Arguments.Get<List<RetryCreate>>("tasks");
+            return calls.First().Arguments.Get<List<RetryAction>>("tasks");
         }
     }
 }

@@ -20,8 +20,8 @@ namespace RetryMachine.Api.Service
         {
             await _retryMachine.CreateTasks(
             [
-                new RetryCreate( LogAction.ActionName, new LogSettings { AccountId = 11, Template = "" },order : 1),
-                new RetryCreate( MonitoringAction.ActionName, new MonitoringSettings { ActionId = 11 },order : 2)
+                new RetryAction( LogAction.ActionName, new LogSettings { AccountId = 11, Template = "" },order : 1),
+                new RetryAction( MonitoringAction.ActionName, new MonitoringSettings { ActionId = 11 },order : 2)
             ]);
         }
 
@@ -29,9 +29,9 @@ namespace RetryMachine.Api.Service
         {
             await _retryMachine.CreateTasks(
             [
-                new RetryCreate( LogAction.ActionName, new LogSettings { AccountId = 11, Template = "" },
+                new RetryAction( LogAction.ActionName, new LogSettings { AccountId = 11, Template = "" },
                     order : 1, runImmediately:true),
-                new RetryCreate( MonitoringAction.ActionName, new MonitoringSettings { ActionId = 11 },order : 2)
+                new RetryAction( MonitoringAction.ActionName, new MonitoringSettings { ActionId = 11 },order : 2)
             ]);
         }
     }

@@ -2,14 +2,14 @@
 
 namespace RetryMachine;
 
-public class RetryCreate
+public class RetryAction
 {
-    public RetryCreate(string taskName, object value, int order, bool runImmediately = false) :
+    public RetryAction(string taskName, object value, int order, bool runImmediately = false) :
         this(taskName, JsonConvert.SerializeObject(value), order, runImmediately)
     {
     }
 
-    public RetryCreate(string taskName, string settings, int order, bool runImmediately = false)
+    public RetryAction(string taskName, string settings, int order, bool runImmediately = false)
     {
         TaskName = taskName;
         Settings = settings;
