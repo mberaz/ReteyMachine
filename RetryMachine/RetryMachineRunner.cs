@@ -131,6 +131,7 @@ namespace RetryMachine
                 {
                     failedActions[order.Key] = result.error;
                     retryTaskModel.Status = (int)RetryStatus.Error;
+                    break;//stop the execution on errors
                 }
             }
 
@@ -139,7 +140,7 @@ namespace RetryMachine
                 retryTaskModel.Status = (int)RetryStatus.Done;
             }
 
-            if(retryTaskModel.Status==(int)RetryStatus.Error)
+            if (retryTaskModel.Status == (int)RetryStatus.Error)
             {
                 retryTaskModel.RetryCount += 1;
             }
