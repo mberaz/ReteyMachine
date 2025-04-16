@@ -17,21 +17,21 @@ namespace RetryMachine
         public Task CreateTasks<T>(string actionName, T value, bool runImmediately = false, string taskName = "", string? taskId = null)
         {
             return CreateTasks(
-                [new RetryCreate(actionName, JsonConvert.SerializeObject(value), 1, runImmediately)],
+                [new RetryAction(actionName, JsonConvert.SerializeObject(value), 1, runImmediately)],
                 taskName, taskId);
         }
 
         public Task CreateTasks(string actionName, string value, bool runImmediately = false, string taskName = "", string? taskId = null)
         {
-            return CreateTasks([new RetryCreate(actionName, value, 1, runImmediately)], taskName, taskId);
+            return CreateTasks([new RetryAction(actionName, value, 1, runImmediately)], taskName, taskId);
         }
 
-        public Task CreateTasks(RetryCreate tasks, string taskName = "", string? taskId = null)
+        public Task CreateTasks(RetryAction tasks, string taskName = "", string? taskId = null)
         {
             return CreateTasks([tasks], taskName, taskId);
         }
 
-        public async Task CreateTasks(List<RetryCreate> tasks, string taskName = "", string? taskId = null)
+        public async Task CreateTasks(List<RetryAction> tasks, string taskName = "", string? taskId = null)
         {
             var nextActions = new JObject();
             var actionOrder = new JObject();
@@ -42,10 +42,11 @@ namespace RetryMachine
             var status = (int)RetryStatus.Pending;
 
             taskId ??= Guid.NewGuid().ToString("N");
+            var executeImmediately = true;
 
             foreach (var task in tasks.OrderBy(o => o.Order))
             {
-                if (task.RunImmediately)
+                if (task.RunImmediately && executeImmediately)
                 {
                     var taskToDo = _possibleActions.FirstOrDefault(f => f.Name() == task.TaskName);
                     if (taskToDo == null)
@@ -66,6 +67,12 @@ namespace RetryMachine
                         nextActions[task.TaskName] = task.Settings;
                         actionOrder[task.TaskName] = task.Order;
                         status = (int)RetryStatus.Error; //if we fail on the task that runs immediately we start in an error status
+
+                        if (task.IsRequired)
+                        {
+                            //skip all next task to RunImmediately if a required task failed
+                            executeImmediately = false;
+                        }
                     }
                 }
                 else
@@ -75,8 +82,9 @@ namespace RetryMachine
                 }
             }
 
-            await _storage.Save(new RetryTask
+            await _storage.Save(new RetryFlow
             {
+                RequiredTasks = tasks.Where(o => o.IsRequired).Select(o => o.TaskName).ToList(),
                 TaskName = taskName,
                 TaskId = taskId,
                 //if we executed all the tasks, then we are done
@@ -101,12 +109,12 @@ namespace RetryMachine
             return taskList.Count;
         }
 
-        private async Task DoTaskInner(RetryTask retryTaskModel)
+        private async Task DoTaskInner(RetryFlow retryFlow)
         {
-            var actionOrder = JsonConvert.DeserializeObject<Dictionary<string, int>>(retryTaskModel.ActionOrder);
-            var nextActions = ToDictionary(retryTaskModel.NextActions);
-            var completedDictionary = ToDictionary(retryTaskModel.CompletedActions);
-            var failedActions = ToDictionary(retryTaskModel.FailedActions);
+            var actionOrder = JsonConvert.DeserializeObject<Dictionary<string, int>>(retryFlow.ActionOrder);
+            var nextActions = ToDictionary(retryFlow.NextActions);
+            var completedDictionary = ToDictionary(retryFlow.CompletedActions);
+            var failedActions = ToDictionary(retryFlow.FailedActions);
 
             foreach (var order in actionOrder.OrderBy(o => o.Value))
             {
@@ -118,7 +126,7 @@ namespace RetryMachine
                     throw new Exception($"Could not find a IRetryable implementation to execute the task: {order.Key}");
                 }
 
-                var result = await taskToDo.Perform(action, retryTaskModel.TaskName, retryTaskModel.TaskId);
+                var result = await taskToDo.Perform(action, retryFlow.TaskName, retryFlow.TaskId);
 
                 if (result.isOk)
                 {
@@ -130,27 +138,31 @@ namespace RetryMachine
                 else
                 {
                     failedActions[order.Key] = result.error;
-                    retryTaskModel.Status = (int)RetryStatus.Error;
-                    break;//stop the execution on errors
+                    retryFlow.Status = (int)RetryStatus.Error;
+
+                    if (retryFlow.RequiredTasks.Contains(retryFlow.TaskName))
+                    {
+                        break;//stop the execution on errors if the action is required
+                    }
                 }
             }
 
             if (nextActions.Count == 0)
             {
-                retryTaskModel.Status = (int)RetryStatus.Done;
+                retryFlow.Status = (int)RetryStatus.Done;
             }
 
-            if (retryTaskModel.Status == (int)RetryStatus.Error)
+            if (retryFlow.Status == (int)RetryStatus.Error)
             {
-                retryTaskModel.RetryCount += 1;
+                retryFlow.RetryCount += 1;
             }
 
-            retryTaskModel.UpdatedOn = DateTime.Now;
-            retryTaskModel.NextActions = JsonConvert.SerializeObject(nextActions);
-            retryTaskModel.CompletedActions = JsonConvert.SerializeObject(completedDictionary);
-            retryTaskModel.FailedActions = JsonConvert.SerializeObject(failedActions);
+            retryFlow.UpdatedOn = DateTime.Now;
+            retryFlow.NextActions = JsonConvert.SerializeObject(nextActions);
+            retryFlow.CompletedActions = JsonConvert.SerializeObject(completedDictionary);
+            retryFlow.FailedActions = JsonConvert.SerializeObject(failedActions);
 
-            await _storage.Update(retryTaskModel);
+            await _storage.Update(retryFlow);
         }
 
         private Dictionary<string, string> ToDictionary(string? values)

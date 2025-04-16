@@ -6,8 +6,8 @@ public interface IRetryMachineRunner
         string taskName = "", string? taskId = null);
     Task CreateTasks(string actionName, string value, bool runImmediately = false,
         string taskName = "", string? taskId = null);
-    Task CreateTasks(RetryCreate tasks, string taskName = "", string? taskId = null);
-    Task CreateTasks(List<RetryCreate> tasks, string taskName = "", string? taskId = null);
+    Task CreateTasks(RetryAction tasks, string taskName = "", string? taskId = null);
+    Task CreateTasks(List<RetryAction> tasks, string taskName = "", string? taskId = null);
 
     Task<int> PerformTasks();
 }

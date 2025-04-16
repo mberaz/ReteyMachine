@@ -2,8 +2,8 @@
 
 public interface IRetryStorage
 {
-    public Task Save(RetryTask retryTaskModel);
-    public Task Update(RetryTask retryTaskModel);
-    public Task<List<RetryTask>> Get();
+    public Task Save(RetryFlow retryFlowModel);
+    public Task Update(RetryFlow retryFlowModel);
+    public Task<List<RetryFlow>> Get();
 }
 
