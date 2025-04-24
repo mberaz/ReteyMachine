@@ -11,14 +11,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IRetryable, AutoLogAction>();
-builder.Services.AddScoped<IRetryable, UserActionLogAction>();
+//builder.Services.AddScoped<IRetryable, AutoLogAction>();
+//builder.Services.AddScoped<IRetryable, UserActionLogAction>();
+//builder.Services.AddSingleton(new RetrySettings { DelayInSeconds = 30 });
+//builder.Services.AddScoped<IRetryMachineRunner, RetryMachineRunner>();
 
-builder.Services.AddSingleton(new RetrySettings { DelayInSeconds = 30 });
-builder.Services.AddScoped<IRetryMachineRunner, RetryMachineRunner>();
-
+builder.Services.RegisterRetryMachine(shouldRegisterImplementations: true, delayInSeconds: 30);
 builder.Services.AddScoped<IRetryStorage, AzureQueueStorage>();
-
 builder.Services.AddScoped<IRandomService, RandomService>();
 
 var app = builder.Build();
