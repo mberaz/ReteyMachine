@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetryMachine", "RetryMachin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{55CAC592-7A04-47AC-90D6-C5CD0BBAC5D3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetryMachine.Framework", "RetryMachine.Framework\RetryMachine.Framework.csproj", "{0375CE87-268C-4122-9978-68C4A4FBB4ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{55CAC592-7A04-47AC-90D6-C5CD0BBAC5D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55CAC592-7A04-47AC-90D6-C5CD0BBAC5D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55CAC592-7A04-47AC-90D6-C5CD0BBAC5D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0375CE87-268C-4122-9978-68C4A4FBB4ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0375CE87-268C-4122-9978-68C4A4FBB4ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0375CE87-268C-4122-9978-68C4A4FBB4ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0375CE87-268C-4122-9978-68C4A4FBB4ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
