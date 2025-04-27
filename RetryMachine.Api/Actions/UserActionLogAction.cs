@@ -25,7 +25,7 @@ public class UserActionLogAction : IRetryable
         }
         catch (Exception e)
         {
-            return Task.FromResult<(bool isOk, string? error)>((true, e.Message));
+            return Task.FromResult<(bool isOk, string? error)>((false, e.Message));
         }
     }
 }
